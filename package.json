@@ -1,0 +1,20 @@
+{
+  "name": "oekakityou-lambda",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "prebuild": "del /q dist",
+    "build": "esbuild index.ts --bundle --minify --sourcemap --platform=node --target=es2020 --outfile=dist/index.js",
+    "postbuild": "cd dist && powershell Compress-Archive -Force -Path index.js* -DestinationPath ../dist.zip"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.149",
+    "esbuild": "^0.25.3"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.802.0"
+  }
+}
