@@ -76,18 +76,36 @@ export const handler = async (event: S3Event) => {
                 .map((imagePath) => fs.readFile(imagePath))
         )
 
+        // Content-Type も付与する
+        let contentType: string
+        switch (imageExtension) {
+            case ".jpg":
+            case ".jpeg":
+                contentType = 'image/jpeg'
+                break
+            case ".png":
+                contentType = 'image/png'
+                break
+            default:
+                // 知らない拡張子の場合は image/ をくっつけて返す
+                contentType = `image/${imageExtension.replace('.', '')}`
+                break
+        }
+
         // 2つの画像で同じ UUID になるように
         // パスは /original と /resize
         const fileName = `${randomUUID()}${imageExtension}`
         const originalPut = new PutObjectCommand({
             Bucket: RESULT_S3_BACKET_NAME,
             Key: `original/${fileName}`,
-            Body: originalByteArray
+            Body: originalByteArray,
+            ContentType: contentType
         })
         const resizePut = new PutObjectCommand({
             Bucket: RESULT_S3_BACKET_NAME,
             Key: `resize/${fileName}`,
-            Body: resizeByteArray
+            Body: resizeByteArray,
+            ContentType: contentType
         })
 
         // 出力先 S3 にアップロード
